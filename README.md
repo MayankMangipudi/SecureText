@@ -54,11 +54,11 @@ python -m http.server 8080
 # Then open http://localhost:8080
 ```
 
-## 🌐 Live Demo
+## Live Demo
 
 Visit: [https://securetext.onrender.com](https://securetext.onrender.com) 
 
-## 📚 Tech Stack
+## Tech Stack
 
 **Backend:**
 - FastAPI
@@ -73,14 +73,14 @@ Visit: [https://securetext.onrender.com](https://securetext.onrender.com)
 - Alpine.js
 - Vanilla JavaScript
 
-## 📸 Screenshots
+## Screenshots
 
 *(Add screenshots after deployment)*
 
-## 👨‍💻 Author
+## Author
 
 **Mayank M (22BCE3115)**
 
-## 📄 License
+## License
 
-MIT License - feel free to use for educational purposes!
+MIT License - feel free to use for educational purposes.
