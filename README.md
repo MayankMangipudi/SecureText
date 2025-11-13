@@ -1,8 +1,8 @@
-# 🔐 SecureText - Cryptography Learning Platform
+# SecureText - Cryptography Learning Platform
 
 A web-based application for learning and implementing AES-256, RSA-2048, and SHA-256 cryptographic algorithms with interactive visualizations.
 
-## 🎓 Features
+## Features
 
 - **AES-256 Encryption/Decryption**: Symmetric encryption with visual step-by-step process
 - **RSA-2048 Encryption/Decryption**: Asymmetric encryption with key generation visualization
@@ -11,7 +11,7 @@ A web-based application for learning and implementing AES-256, RSA-2048, and SHA
 - **History Tracking**: Keep track of all cryptographic operations
 - **User Authentication**: Secure login system with JWT
 
-## 🚀 Quick Start (Local)
+## Quick Start (Local)
 
 ### Prerequisites
 - Python 3.11+
@@ -56,7 +56,7 @@ python -m http.server 8080
 
 ## 🌐 Live Demo
 
-Visit: [https://securetext.onrender.com](https://securetext.onrender.com) *(will be updated after deployment)*
+Visit: [https://securetext.onrender.com](https://securetext.onrender.com) 
 
 ## 📚 Tech Stack
 
@@ -79,7 +79,7 @@ Visit: [https://securetext.onrender.com](https://securetext.onrender.com) *(will
 
 ## 👨‍💻 Author
 
-**Josh (22BCE3115)**
+**Mayank M (22BCE3115)**
 
 ## 📄 License
 
