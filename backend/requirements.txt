@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+cryptography
+sqlalchemy
+pydantic
+passlib[bcrypt]
+pyjwt
+jinja2
+pycryptodome

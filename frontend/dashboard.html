@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureText - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100">
+    
+    <div x-data="dashboard()" x-init="init()" class="flex h-screen">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white flex flex-col shadow-2xl">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold mb-2">🔐 SecureText</h1>
+                <p class="text-sm opacity-80" x-text="'Welcome, ' + username"></p>
+            </div>
+            
+            <nav class="flex-1 px-4">
+                <button @click="currentTab = 'aes'" 
+                    :class="currentTab === 'aes' ? 'bg-white bg-opacity-20' : 'hover:bg-white hover:bg-opacity-10'"
+                    class="w-full text-left px-4 py-3 rounded-lg mb-2 transition duration-200 flex items-center">
+                    <span class="mr-3">🔐</span> AES Encryption
+                </button>
+                
+                <button @click="currentTab = 'rsa'" 
+                    :class="currentTab === 'rsa' ? 'bg-white bg-opacity-20' : 'hover:bg-white hover:bg-opacity-10'"
+                    class="w-full text-left px-4 py-3 rounded-lg mb-2 transition duration-200 flex items-center">
+                    <span class="mr-3">🔑</span> RSA Encryption
+                </button>
+                
+                <button @click="currentTab = 'sha'" 
+                    :class="currentTab === 'sha' ? 'bg-white bg-opacity-20' : 'hover:bg-white hover:bg-opacity-10'"
+                    class="w-full text-left px-4 py-3 rounded-lg mb-2 transition duration-200 flex items-center">
+                    <span class="mr-3">🔒</span> SHA-256 Hash
+                </button>
+
+                <!-- NEW LEARN TAB -->
+                <button @click="currentTab = 'learn'" 
+                    :class="currentTab === 'learn' ? 'bg-white bg-opacity-20' : 'hover:bg-white hover:bg-opacity-10'"
+                    class="w-full text-left px-4 py-3 rounded-lg mb-2 transition duration-200 flex items-center">
+                    <span class="mr-3">🎓</span> Learn Crypto
+                </button>
+                
+                <button @click="currentTab = 'history'" 
+                    :class="currentTab === 'history' ? 'bg-white bg-opacity-20' : 'hover:bg-white hover:bg-opacity-10'"
+                    class="w-full text-left px-4 py-3 rounded-lg mb-2 transition duration-200 flex items-center">
+                    <span class="mr-3">📜</span> History
+                </button>
+            </nav>
+            
+            <div class="p-4">
+                <button @click="handleLogout()" 
+                    class="w-full bg-red-500 hover:bg-red-600 px-4 py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                    <span class="mr-2">🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <div class="p-8">
+                
+                <!-- AES Tab -->
+                <div x-show="currentTab === 'aes'" x-transition class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">AES Encryption</h2>
+                    
+                    <!-- Key Management -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <label class="block text-gray-700 font-medium mb-2">AES Key</label>
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                x-model="aesKey"
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none font-mono text-sm"
+                                placeholder="Enter or generate a key"
+                            >
+                            <button @click="handleGenerateAesKey()" 
+                                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition duration-200">
+                                Generate Key
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3-Panel Layout -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Plaintext Input -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📝 Plaintext</h3>
+                            <textarea 
+                                x-model="aesPlaintext"
+                                rows="10"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                                placeholder="Enter text to encrypt..."
+                            ></textarea>
+                            <button @click="handleEncryptAes()" 
+                                class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                🔒 Encrypt
+                            </button>
+                        </div>
+
+                        <!-- Ciphertext Output -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🔐 Encrypted</h3>
+                            <textarea 
+                                x-model="aesCiphertext"
+                                rows="10"
+                                readonly
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm resize-none"
+                                placeholder="Encrypted text will appear here..."
+                            ></textarea>
+                            <button @click="copyToClipboard(aesCiphertext)" 
+                                class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                📋 Copy
+                            </button>
+                        </div>
+
+                        <!-- Decrypted Output -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🔓 Decrypted</h3>
+                            <textarea 
+                                x-model="aesDecrypted"
+                                rows="10"
+                                readonly
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 resize-none"
+                                placeholder="Decrypted text will appear here..."
+                            ></textarea>
+                            <button @click="handleDecryptAes()" 
+                                class="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                🔓 Decrypt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RSA Tab (keeping same structure, not repeating full code) -->
+                <div x-show="currentTab === 'rsa'" x-transition class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">RSA Encryption</h2>
+                    
+                    <!-- Key Management -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex gap-4 mb-4">
+                            <button @click="handleGenerateRsaKeys()" 
+                                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition duration-200">
+                                Generate RSA Keys
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Public Key</label>
+                                <textarea 
+                                    x-model="rsaPublicKey"
+                                    rows="4"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none font-mono text-xs"
+                                    placeholder="Public key will appear here..."
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Private Key</label>
+                                <textarea 
+                                    x-model="rsaPrivateKey"
+                                    rows="4"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none font-mono text-xs"
+                                    placeholder="Private key will appear here..."
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3-Panel Layout -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📝 Plaintext</h3>
+                            <textarea 
+                                x-model="rsaPlaintext"
+                                rows="10"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                                placeholder="Enter text to encrypt..."
+                            ></textarea>
+                            <button @click="handleEncryptRsa()" 
+                                class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                🔒 Encrypt
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🔐 Encrypted</h3>
+                            <textarea 
+                                x-model="rsaCiphertext"
+                                rows="10"
+                                readonly
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm resize-none"
+                                placeholder="Encrypted text will appear here..."
+                            ></textarea>
+                            <button @click="copyToClipboard(rsaCiphertext)" 
+                                class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                📋 Copy
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🔓 Decrypted</h3>
+                            <textarea 
+                                x-model="rsaDecrypted"
+                                rows="10"
+                                readonly
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 resize-none"
+                                placeholder="Decrypted text will appear here..."
+                            ></textarea>
+                            <button @click="handleDecryptRsa()" 
+                                class="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                🔓 Decrypt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SHA Tab (keeping same structure) -->
+                <div x-show="currentTab === 'sha'" x-transition class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">SHA-256 Hash</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📝 Input</h3>
+                            <textarea 
+                                x-model="shaInput"
+                                rows="10"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                                placeholder="Enter text to hash..."
+                            ></textarea>
+                            <button @click="handleHashSha()" 
+                                class="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                🔒 Generate Hash
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🔐 SHA-256 Hash</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-300 break-all font-mono text-sm min-h-[240px]">
+                                <span x-text="shaOutput || 'Hash will appear here...'" class="text-gray-700"></span>
+                            </div>
+                            <button @click="copyToClipboard(shaOutput)" 
+                                class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                                📋 Copy Hash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW LEARN TAB -->
+                <div x-show="currentTab === 'learn'" x-transition class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">🎓 Learn Cryptography</h2>
+                    
+                    <!-- Choose Algorithm -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Choose Algorithm to Learn</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button @click="learnMode = 'aes'; learnStep = 0; learnSteps = []" 
+                                :class="learnMode === 'aes' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                                class="px-8 py-6 rounded-lg font-bold text-lg transition duration-200 shadow-md">
+                                🔐 AES-256 Encryption
+                            </button>
+                            <button @click="learnMode = 'rsa'; learnStep = 0; learnSteps = []" 
+                                :class="learnMode === 'rsa' ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                                class="px-8 py-6 rounded-lg font-bold text-lg transition duration-200 shadow-md">
+                                🔑 RSA-2048 Encryption
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AES Learning Mode -->
+                    <div x-show="learnMode === 'aes'" x-transition class="space-y-6">
+                        <!-- Input Section -->
+                        <div x-show="learnSteps.length === 0" x-transition class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800">📝 Enter Data to Encrypt</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Plaintext</label>
+                                    <input 
+                                        type="text" 
+                                        x-model="learnPlaintext"
+                                        placeholder="e.g., Hello World"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">AES Key (or generate one)</label>
+                                    <div class="flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            x-model="learnAesKey"
+                                            placeholder="Click Generate Key"
+                                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none font-mono text-sm"
+                                        >
+                                        <button @click="handleGenerateLearnKey()" 
+                                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition duration-200">
+                                            Generate
+                                        </button>
+                                    </div>
+                                </div>
+                                <button @click="handleStartAesVisualization()" 
+                                    :disabled="!learnPlaintext || !learnAesKey"
+                                    :class="!learnPlaintext || !learnAesKey ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg'"
+                                    class="w-full text-white font-bold py-4 rounded-lg transition duration-200">
+                                    🚀 Start AES Visualization
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step-by-Step Visualization -->
+                        <div x-show="learnSteps.length > 0" x-transition class="space-y-6">
+                            <!-- Progress Bar -->
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">
+                                        Step <span x-text="learnStep + 1"></span> of <span x-text="learnSteps.length"></span>
+                                    </h3>
+                                    <button @click="learnMode = null; learnSteps = []; learnStep = 0" 
+                                        class="text-red-500 hover:text-red-600 font-medium">
+                                        ↺ Restart
+                                    </button>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                                        :style="`width: ${((learnStep + 1) / learnSteps.length) * 100}%`">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Current Step Display -->
+                            <template x-if="learnSteps[learnStep]">
+                                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-lg p-8 border-2 border-blue-200">
+                                    <!-- Step Header -->
+                                    <div class="mb-6">
+                                        <h3 class="text-3xl font-bold text-gray-800 mb-2" x-text="learnSteps[learnStep].title"></h3>
+                                        <p class="text-lg text-gray-600" x-text="learnSteps[learnStep].description"></p>
+                                    </div>
+
+                                    <!-- Step Content -->
+                                    <div class="bg-white rounded-lg p-6 shadow-inner">
+                                        <!-- Step 1: Original Plaintext -->
+                                        <template x-if="learnStep === 0">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div>
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">Original Text:</p>
+                                                        <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 text-lg font-mono">
+                                                            <span x-text="learnSteps[0].data.text"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">As Bytes (Hexadecimal):</p>
+                                                        <div class="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 text-sm font-mono break-all">
+                                                            <span x-text="window.learnUtils.formatHexBytes(learnSteps[0].data.bytes)"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-center mt-4">
+                                                    <p class="text-gray-600">
+                                                        💡 Each character is converted to bytes. Length: <strong x-text="learnSteps[0].data.length"></strong> bytes
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 2: Padding -->
+                                        <template x-if="learnStep === 1">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div>
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">Before Padding:</p>
+                                                        <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 text-xs font-mono break-all">
+                                                            <span x-text="window.learnUtils.formatHexBytes(learnSteps[1].data.before)"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">After Padding:</p>
+                                                        <div class="bg-green-50 border-2 border-green-300 rounded-lg p-4 text-xs font-mono break-all">
+                                                            <span x-text="window.learnUtils.formatHexBytes(learnSteps[1].data.after)"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-center mt-4">
+                                                    <p class="text-gray-600">
+                                                        💡 Added <strong x-text="learnSteps[1].data.padding_added"></strong> padding bytes to reach 16-byte block size
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 3: Key -->
+                                        <template x-if="learnStep === 2">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div>
+                                                    <p class="text-sm font-semibold text-gray-600 mb-2">AES-256 Key (Hexadecimal):</p>
+                                                    <div class="bg-indigo-50 border-2 border-indigo-300 rounded-lg p-4 text-xs font-mono break-all">
+                                                        <span x-text="window.learnUtils.formatHexBytes(learnSteps[2].data.key)"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="grid grid-cols-3 gap-4 mt-6">
+                                                    <div class="text-center p-4 bg-blue-100 rounded-lg">
+                                                        <p class="text-2xl font-bold text-blue-600" x-text="learnSteps[2].data.key_size"></p>
+                                                        <p class="text-sm text-gray-600">Bits</p>
+                                                    </div>
+                                                    <div class="text-center p-4 bg-purple-100 rounded-lg">
+                                                        <p class="text-2xl font-bold text-purple-600" x-text="learnSteps[2].data.key_size / 8"></p>
+                                                        <p class="text-sm text-gray-600">Bytes</p>
+                                                    </div>
+                                                    <div class="text-center p-4 bg-pink-100 rounded-lg">
+                                                        <p class="text-2xl font-bold text-pink-600" x-text="learnSteps[2].data.rounds"></p>
+                                                        <p class="text-sm text-gray-600">Rounds</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 4: Encryption Rounds -->
+                                        <template x-if="learnStep === 3">
+                                            <div class="space-y-6 animate-fade-in">
+                                                <div class="text-center">
+                                                    <p class="text-xl font-semibold text-gray-700 mb-4">AES-256 uses <span class="text-3xl text-purple-600 font-bold">14</span> rounds of transformations</p>
+                                                </div>
+                                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    <template x-for="(op, index) in learnSteps[3].data.operations" :key="index">
+                                                        <div class="bg-gradient-to-br from-purple-100 to-pink-100 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-200">
+                                                            <p class="text-center font-bold text-gray-800" x-text="op"></p>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mt-4">
+                                                    <p class="text-sm font-semibold text-gray-600 mb-2">Initialization Vector (IV):</p>
+                                                    <p class="font-mono text-xs break-all" x-text="learnSteps[3].data.iv"></p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <p class="text-gray-600">💡 Each round applies these 4 operations in sequence to scramble the data</p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 5: Final Ciphertext -->
+                                        <template x-if="learnStep === 4">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div>
+                                                    <p class="text-sm font-semibold text-gray-600 mb-2">Final Encrypted Output (Base64):</p>
+                                                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-4 text-sm font-mono break-all">
+                                                        <span x-text="learnSteps[4].data.ciphertext"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-4 mt-6">
+                                                    <div class="text-center p-4 bg-green-100 rounded-lg">
+                                                        <p class="text-2xl font-bold text-green-600" x-text="learnSteps[4].data.length"></p>
+                                                        <p class="text-sm text-gray-600">Encrypted Bytes</p>
+                                                    </div>
+                                                    <div class="text-center p-4 bg-teal-100 rounded-lg">
+                                                        <p class="text-lg font-bold text-teal-600" x-text="learnSteps[4].data.format"></p>
+                                                        <p class="text-sm text-gray-600">Encoding</p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-center mt-6">
+                                                    <p class="text-lg font-semibold text-green-600">✅ Encryption Complete!</p>
+                                                    <p class="text-gray-600 mt-2">Your data is now secure and can only be decrypted with the correct key.</p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- Navigation Buttons -->
+                                    <div class="flex justify-between mt-8">
+                                        <button @click="learnStep = Math.max(0, learnStep - 1)" 
+                                            :disabled="learnStep === 0"
+                                            :class="learnStep === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-500 hover:bg-gray-600'"
+                                            class="px-8 py-3 text-white font-bold rounded-lg transition duration-200">
+                                            ← Previous
+                                        </button>
+                                        <button @click="learnStep = Math.min(learnSteps.length - 1, learnStep + 1)" 
+                                            :disabled="learnStep === learnSteps.length - 1"
+                                            :class="learnStep === learnSteps.length - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg'"
+                                            class="px-8 py-3 text-white font-bold rounded-lg transition duration-200">
+                                            Next →
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- RSA Learning Mode -->
+                    <div x-show="learnMode === 'rsa'" x-transition class="space-y-6">
+                        <!-- Input Section -->
+                        <div x-show="learnSteps.length === 0" x-transition class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800">📝 Enter Message to Encrypt</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Message</label>
+                                    <input 
+                                        type="text" 
+                                        x-model="learnPlaintext"
+                                        placeholder="e.g., Secret Message"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                                    >
+                                </div>
+                                <button @click="handleStartRsaVisualization()" 
+                                    :disabled="!learnPlaintext"
+                                    :class="!learnPlaintext ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-green-500 to-teal-600 hover:shadow-lg'"
+                                    class="w-full text-white font-bold py-4 rounded-lg transition duration-200">
+                                    🚀 Start RSA Visualization
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- RSA Step-by-Step (similar structure to AES) -->
+                        <div x-show="learnSteps.length > 0" x-transition class="space-y-6">
+                            <!-- Progress Bar -->
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">
+                                        Step <span x-text="learnStep + 1"></span> of <span x-text="learnSteps.length"></span>
+                                    </h3>
+                                    <button @click="learnMode = null; learnSteps = []; learnStep = 0" 
+                                        class="text-red-500 hover:text-red-600 font-medium">
+                                        ↺ Restart
+                                    </button>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-gradient-to-r from-green-500 to-teal-600 h-3 rounded-full transition-all duration-500"
+                                        :style="`width: ${((learnStep + 1) / learnSteps.length) * 100}%`">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Current Step Display -->
+                            <template x-if="learnSteps[learnStep]">
+                                <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg shadow-lg p-8 border-2 border-green-200">
+                                    <!-- Step Header -->
+                                    <div class="mb-6">
+                                        <h3 class="text-3xl font-bold text-gray-800 mb-2" x-text="learnSteps[learnStep].title"></h3>
+                                        <p class="text-lg text-gray-600" x-text="learnSteps[learnStep].description"></p>
+                                    </div>
+
+                                    <!-- Step Content -->
+                                    <div class="bg-white rounded-lg p-6 shadow-inner">
+                                        <!-- Step 1: Prime Numbers -->
+                                        <template x-if="learnStep === 0">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-6">
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">Prime p:</p>
+                                                        <p class="text-lg font-mono break-all" x-text="learnSteps[0].data.p"></p>
+                                                    </div>
+                                                    <div class="bg-purple-50 border-2 border-purple-300 rounded-lg p-6">
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">Prime q:</p>
+                                                        <p class="text-lg font-mono break-all" x-text="learnSteps[0].data.q"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-center mt-4">
+                                                    <p class="text-gray-600" x-text="learnSteps[0].data.note"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 2: Calculate n -->
+                                        <template x-if="learnStep === 1">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="text-center mb-6">
+                                                    <p class="text-2xl font-mono text-gray-700">n = p × q</p>
+                                                </div>
+                                                <div class="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg p-6">
+                                                    <p class="text-sm font-semibold text-gray-600 mb-2">Modulus n:</p>
+                                                    <p class="text-lg font-mono break-all" x-text="learnSteps[1].data.n"></p>
+                                                </div>
+                                                <div class="text-center p-4 bg-indigo-100 rounded-lg">
+                                                    <p class="text-2xl font-bold text-indigo-600" x-text="learnSteps[1].data.bit_length"></p>
+                                                    <p class="text-sm text-gray-600">Bit Length</p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 3: φ(n) -->
+                                        <template x-if="learnStep === 2">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="text-center mb-6">
+                                                    <p class="text-2xl font-mono text-gray-700">φ(n) = (p - 1) × (q - 1)</p>
+                                                </div>
+                                                <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6">
+                                                    <p class="text-sm font-semibold text-gray-600 mb-2">Euler's Totient φ(n):</p>
+                                                    <p class="text-lg font-mono break-all" x-text="learnSteps[2].data.phi_n"></p>
+                                                </div>
+                                                <div class="text-center mt-4">
+                                                    <p class="text-gray-600" x-text="learnSteps[2].data.purpose"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 4: Public exponent -->
+                                        <template x-if="learnStep === 3">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="text-center p-8 bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg">
+                                                    <p class="text-4xl font-bold text-green-600" x-text="learnSteps[3].data.e"></p>
+                                                    <p class="text-lg text-gray-700 mt-2">Public Exponent (e)</p>
+                                                </div>
+                                                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                                                    <p class="text-sm font-semibold text-gray-600">Condition:</p>
+                                                    <p class="font-mono text-sm" x-text="learnSteps[3].data.condition"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 5: Private exponent -->
+                                        <template x-if="learnStep === 4">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="text-center mb-6">
+                                                    <p class="text-xl font-mono text-gray-700" x-text="learnSteps[4].data.relationship"></p>
+                                                </div>
+                                                <div class="bg-red-50 border-2 border-red-300 rounded-lg p-6">
+                                                    <p class="text-sm font-semibold text-gray-600 mb-2">🔒 Private Exponent d (SECRET):</p>
+                                                    <p class="text-lg font-mono break-all" x-text="learnSteps[4].data.d"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 6: Keys Generated -->
+                                        <template x-if="learnStep === 5">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div class="bg-green-50 border-2 border-green-300 rounded-lg p-6">
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">✅ Public Key (Share this):</p>
+                                                        <p class="text-xs font-mono break-all" x-text="learnSteps[5].data.public_key"></p>
+                                                        <div class="mt-4 p-3 bg-white rounded">
+                                                            <p class="text-xs text-gray-600">n = modulus</p>
+                                                            <p class="text-xs text-gray-600" x-text="'e = ' + learnSteps[5].data.public_components.e"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="bg-red-50 border-2 border-red-300 rounded-lg p-6">
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">🔒 Private Key (Keep SECRET):</p>
+                                                        <p class="text-lg font-bold text-red-600">⚠️ HIDDEN FOR SECURITY</p>
+                                                        <div class="mt-4 p-3 bg-white rounded">
+                                                            <p class="text-xs text-gray-600">n = modulus</p>
+                                                            <p class="text-xs text-gray-600">d = secret exponent</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 7: Encryption -->
+                                        <template x-if="learnStep === 6">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="text-center mb-6">
+                                                    <p class="text-2xl font-mono text-gray-700">c = m<sup>e</sup> mod n</p>
+                                                </div>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-6">
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">Original Message:</p>
+                                                        <p class="text-lg" x-text="learnSteps[6].data.plaintext"></p>
+                                                    </div>
+                                                    <div class="bg-green-50 border-2 border-green-300 rounded-lg p-6">
+                                                        <p class="text-sm font-semibold text-gray-600 mb-2">Encrypted (Base64):</p>
+                                                        <p class="text-xs font-mono break-all" x-text="learnSteps[6].data.ciphertext"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Step 8: Decryption -->
+                                        <template x-if="learnStep === 7">
+                                            <div class="space-y-4 animate-fade-in">
+                                                <div class="text-center mb-6">
+                                                    <p class="text-2xl font-mono text-gray-700">m = c<sup>d</sup> mod n</p>
+                                                </div>
+                                                <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg p-6">
+                                                    <p class="text-sm font-semibold text-gray-600 mb-4" x-text="learnSteps[7].data.formula"></p>
+                                                    <p class="text-gray-600" x-text="learnSteps[7].data.note"></p>
+                                                </div>
+                                                <div class="text-center mt-6">
+                                                    <p class="text-lg font-semibold text-green-600">✅ RSA Process Complete!</p>
+                                                    <p class="text-gray-600 mt-2">Only the holder of the private key can decrypt this message.</p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- Navigation Buttons -->
+                                    <div class="flex justify-between mt-8">
+                                        <button @click="learnStep = Math.max(0, learnStep - 1)" 
+                                            :disabled="learnStep === 0"
+                                            :class="learnStep === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-500 hover:bg-gray-600'"
+                                            class="px-8 py-3 text-white font-bold rounded-lg transition duration-200">
+                                            ← Previous
+                                        </button>
+                                        <button @click="learnStep = Math.min(learnSteps.length - 1, learnStep + 1)" 
+                                            :disabled="learnStep === learnSteps.length - 1"
+                                            :class="learnStep === learnSteps.length - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-green-500 to-teal-600 hover:shadow-lg'"
+                                            class="px-8 py-3 text-white font-bold rounded-lg transition duration-200">
+                                            Next →
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div x-show="currentTab === 'history'" x-transition class="space-y-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800">📜 History</h2>
+                        <button @click="handleClearHistory()" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2">
+                            <span>🗑️</span> Clear History
+                        </button>
+                    </div>
+                    
+                    <div x-show="history.length === 0" class="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+                        No history yet. Start encrypting to see your activity!
+                    </div>
+
+                    <div class="space-y-4">
+                        <template x-for="item in history" :key="item.id">
+                            <div class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition duration-200"
+                                @click="item.expanded = !item.expanded">
+                                
+                                <!-- Collapsed View -->
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <span class="text-2xl" x-text="window.historyUtils.getIcon(item.algorithm)"></span>
+                                            <h3 class="text-lg font-semibold text-gray-800" x-text="item.algorithm"></h3>
+                                            <span class="text-sm text-gray-500" x-text="window.historyUtils.formatTime(item.timestamp)"></span>
+                                        </div>
+                                        <p class="text-gray-600 text-sm mb-2">
+                                            <span class="font-medium">Input:</span> 
+                                            <span x-text="item.plaintext_preview.length > 50 ? item.plaintext_preview.substring(0, 50) + '...' : item.plaintext_preview"></span>
+                                        </p>
+                                        <p class="text-gray-500 text-xs" x-text="item.input_length + ' characters'"></p>
+                                    </div>
+                                    <span class="text-gray-400" x-text="item.expanded ? '▲' : '▼'"></span>
+                                </div>
+
+                                <!-- Expanded View -->
+                                <div x-show="item.expanded" x-transition class="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                                    <div>
+                                        <span class="font-medium text-gray-700">📅 Timestamp:</span>
+                                        <span class="text-gray-600 ml-2" x-text="new Date(item.timestamp).toLocaleString()"></span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">📊 Algorithm:</span>
+                                        <span class="text-gray-600 ml-2" x-text="item.algorithm"></span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">📏 Input Length:</span>
+                                        <span class="text-gray-600 ml-2" x-text="item.input_length + ' characters'"></span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">📝 Full Input:</span>
+                                        <div class="mt-2 p-3 bg-gray-50 rounded border border-gray-200 font-mono text-sm break-all">
+                                            <span x-text="item.plaintext_preview"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Loading Spinner -->
+    <div x-show="loading" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto"></div>
+            <p class="mt-4 text-gray-700">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div x-show="notification.show" 
+        x-transition
+        x-cloak
+        :class="notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'"
+        class="fixed top-4 right-4 text-white px-6 py-4 rounded-lg shadow-lg z-50">
+        <span x-text="notification.message"></span>
+    </div>
+
+    <!-- Scripts - IMPORTANT ORDER -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/aes.js"></script>
+    <script src="js/rsa.js"></script>
+    <script src="js/sha.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/learn.js"></script>
+
+    <!-- Dashboard function -->
+    <script>
+        function dashboard() {
+            return {
+                username: localStorage.getItem('username') || 'User',
+                currentTab: 'aes',
+                loading: false,
+                notification: { show: false, message: '', type: 'success' },
+                history: [],
+                
+                aesKey: '',
+                aesPlaintext: '',
+                aesCiphertext: '',
+                aesDecrypted: '',
+                
+                rsaPublicKey: '',
+                rsaPrivateKey: '',
+                rsaPlaintext: '',
+                rsaCiphertext: '',
+                rsaDecrypted: '',
+                
+                shaInput: '',
+                shaOutput: '',
+
+                // Learn mode variables
+                learnMode: null, // 'aes' or 'rsa'
+                learnStep: 0,
+                learnSteps: [],
+                learnPlaintext: '',
+                learnAesKey: '',
+
+                async init() {
+                    console.log('Dashboard initializing...');
+                    this.loading = true;
+                    
+                    try {
+                        const user = await verifyAuth();
+                        console.log('User verified:', user);
+                        
+                        if (user) {
+                            this.username = user.username;
+                            await this.refreshHistory();
+                        }
+                    } catch (error) {
+                        console.error('Initialization error:', error);
+                        setTimeout(() => logout(), 2000);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async refreshHistory() {
+                    try {
+                        this.history = await window.historyUtils.load();
+                    } catch (error) {
+                        console.error('History load error:', error);
+                    }
+                },
+
+                async handleGenerateAesKey() {
+                    try {
+                        this.loading = true;
+                        this.aesKey = await window.aes.generateKey();
+                        this.showNotification('AES key generated!', 'success');
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleEncryptAes() {
+                    if (!this.aesPlaintext || !this.aesKey) {
+                        this.showNotification('Please enter text and key', 'error');
+                        return;
+                    }
+                    try {
+                        this.loading = true;
+                        this.aesCiphertext = await window.aes.encrypt(this.aesPlaintext, this.aesKey);
+                        this.showNotification('Text encrypted!', 'success');
+                        await this.refreshHistory();
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleDecryptAes() {
+                    if (!this.aesCiphertext || !this.aesKey) {
+                        this.showNotification('Please enter ciphertext and key', 'error');
+                        return;
+                    }
+                    try {
+                        this.loading = true;
+                        this.aesDecrypted = await window.aes.decrypt(this.aesCiphertext, this.aesKey);
+                        this.showNotification('Text decrypted!', 'success');
+                        await this.refreshHistory();
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleGenerateRsaKeys() {
+                    try {
+                        this.loading = true;
+                        const keys = await window.rsa.generateKeys();
+                        this.rsaPublicKey = keys.publicKey;
+                        this.rsaPrivateKey = keys.privateKey;
+                        this.showNotification('RSA keys generated!', 'success');
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleEncryptRsa() {
+                    if (!this.rsaPlaintext || !this.rsaPublicKey) {
+                        this.showNotification('Please enter text and public key', 'error');
+                        return;
+                    }
+                    try {
+                        this.loading = true;
+                        this.rsaCiphertext = await window.rsa.encrypt(this.rsaPlaintext, this.rsaPublicKey);
+                        this.showNotification('Text encrypted!', 'success');
+                        await this.refreshHistory();
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleDecryptRsa() {
+                    if (!this.rsaCiphertext || !this.rsaPrivateKey) {
+                        this.showNotification('Please enter ciphertext and private key', 'error');
+                        return;
+                    }
+                    try {
+                        this.loading = true;
+                        this.rsaDecrypted = await window.rsa.decrypt(this.rsaCiphertext, this.rsaPrivateKey);
+                        this.showNotification('Text decrypted!', 'success');
+                        await this.refreshHistory();
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleHashSha() {
+                    if (!this.shaInput) {
+                        this.showNotification('Please enter text to hash', 'error');
+                        return;
+                    }
+                    try {
+                        this.loading = true;
+                        this.shaOutput = await window.sha.hash(this.shaInput);
+                        this.showNotification('Hash generated!', 'success');
+                        await this.refreshHistory();
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                // NEW: Learn mode handlers
+                async handleGenerateLearnKey() {
+                    try {
+                        this.loading = true;
+                        const data = await window.api.generateAesKey();
+                        this.learnAesKey = data.key;
+                        this.showNotification('Key generated!', 'success');
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleStartAesVisualization() {
+                    try {
+                        this.loading = true;
+                        const data = await window.api.visualizeAes(this.learnPlaintext, this.learnAesKey);
+                        this.learnSteps = data.steps;
+                        this.learnStep = 0;
+                        this.showNotification('Visualization started!', 'success');
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleStartRsaVisualization() {
+                    try {
+                        this.loading = true;
+                        const data = await window.api.visualizeRsa(this.learnPlaintext);
+                        this.learnSteps = data.steps;
+                        this.learnStep = 0;
+                        this.showNotification('Visualization started!', 'success');
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleClearHistory() {
+                    if (!confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                        return;
+                    }
+                    try {
+                        this.loading = true;
+                        await window.api.clearHistory();
+                        this.history = [];
+                        this.showNotification('History cleared successfully!', 'success');
+                    } catch (error) {
+                        this.showNotification(error.message, 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                copyToClipboard(text) {
+                    if (!text) {
+                        this.showNotification('Nothing to copy', 'error');
+                        return;
+                    }
+                    navigator.clipboard.writeText(text);
+                    this.showNotification('Copied to clipboard!', 'success');
+                },
+
+                showNotification(message, type) {
+                    this.notification = { show: true, message, type };
+                    setTimeout(() => {
+                        this.notification.show = false;
+                    }, 3000);
+                },
+
+                handleLogout() {
+                    logout();
+                }
+            }
+        }
+    </script>
+
+    <!-- Alpine.js MUST load AFTER dashboard() is defined -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Hide elements before Alpine loads */
+        [x-cloak] { display: none !important; }
+        
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-out;
+        }
+    </style>
+</body>
+</html>
