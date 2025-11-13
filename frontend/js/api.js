@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://127.0.0.1:8000';
+// Auto-detect API URL
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://127.0.0.1:8000'  // Local development
+    : window.location.origin;  // Use same origin in production (Replit serves both)
 
 // Helper function to make API calls
 async function apiCall(endpoint, options = {}) {
@@ -22,7 +25,6 @@ async function apiCall(endpoint, options = {}) {
         const data = await response.json();
 
         if (!response.ok) {
-            // Better error handling
             const errorMessage = data.detail 
                 ? (Array.isArray(data.detail) 
                     ? data.detail.map(e => e.msg).join(', ') 
@@ -94,14 +96,14 @@ window.api = {
         method: 'DELETE'
     }),
 
-    // Learn endpoints - FIXED parameter names
+    // Learn endpoints
     visualizeAes: (plaintext, key) => apiCall('/learn/aes/visualize', {
         method: 'POST',
-        body: JSON.stringify({ plaintext, key })  // Changed from { plaintext, key } object format
+        body: JSON.stringify({ plaintext, key })
     }),
 
     visualizeRsa: (plaintext) => apiCall('/learn/rsa/visualize', {
         method: 'POST',
-        body: JSON.stringify({ plaintext })  // Changed parameter name
+        body: JSON.stringify({ plaintext })
     })
 };
