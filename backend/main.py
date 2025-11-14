@@ -23,11 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API Routes - Register routers
-app.include_router(auth_routes.router, prefix="/auth", tags=["auth"])
-app.include_router(crypto_routes.router, prefix="/crypto", tags=["crypto"])
-app.include_router(history_routes.router, prefix="/history", tags=["history"])
-app.include_router(learn_routes.router, prefix="/learn", tags=["learn"])
+# API Routes - DON'T add prefix here, routes already have it
+app.include_router(auth_routes.router, tags=["auth"])
+app.include_router(crypto_routes.router, tags=["crypto"])
+app.include_router(history_routes.router, tags=["history"])
+app.include_router(learn_routes.router, tags=["learn"])
 
 @app.get("/")
 def root():
