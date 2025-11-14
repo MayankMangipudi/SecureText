@@ -6,11 +6,18 @@ import sys
 # Add backend directory to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
-# Now import with relative paths
+# Import database
 from app.database import Base, engine
-from app.routes import auth_routes, crypto_routes, history_routes, learn_routes
 
+# IMPORTANT: Import all models BEFORE creating tables
+from app.models.user import User
+from app.models.history import History
+
+# Now create all tables
 Base.metadata.create_all(bind=engine)
+
+# Import routes after database setup
+from app.routes import auth_routes, crypto_routes, history_routes, learn_routes
 
 app = FastAPI(title="SecureText API", docs_url="/docs", redoc_url="/redoc")
 
@@ -50,3 +57,8 @@ async def startup_event():
         if hasattr(route, "methods"):
             print(f"{route.methods} {route.path}")
     print("========================\n")
+    
+    # Debug: Check if tables exist
+    print("\n=== Database Tables ===")
+    print(f"Tables: {Base.metadata.tables.keys()}")
+    print("=======================\n")
