@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from backend.app.models.user import User
-from backend.app.routes.crypto_routes import get_current_user
-from backend.app.schemas.learn_schema import AesVisualizeRequest, RsaVisualizeRequest
+from app.models.user import User
+from app.routes.crypto_routes import get_current_user
+from app.schemas.learn_schema import AesVisualizeRequest, RsaVisualizeRequest
 import base64
 
 router = APIRouter(prefix="/learn")

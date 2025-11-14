@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.app.schemas.crypto_schema import TextPayload
-from backend.app.security.aes_lib import aes_encrypt, aes_decrypt, generate_aes_key
-from backend.app.security.rsa_lib import rsa_encrypt, rsa_decrypt, generate_rsa_keys
-from backend.app.security.sha_lib import sha256_hash
-from backend.app.database import SessionLocal
-from backend.app.models.user import User
-from backend.app.models.history import History
+from app.schemas.crypto_schema import TextPayload
+from app.security.aes_lib import aes_encrypt, aes_decrypt, generate_aes_key
+from app.security.rsa_lib import rsa_encrypt, rsa_decrypt, generate_rsa_keys
+from app.security.sha_lib import sha256_hash
+from app.database import SessionLocal
+from app.models.user import User
+from app.models.history import History
 import jwt
 from backend.config import SECRET_KEY, ALGORITHM
 from fastapi.security import HTTPBearer

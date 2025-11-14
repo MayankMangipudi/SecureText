@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.app.database import SessionLocal
-from backend.app.models.history import History
-from backend.app.models.user import User
-from backend.app.schemas.history_schema import HistoryOut
-from backend.app.utils.jwt_handler import create_access_token
+from app.database import SessionLocal
+from app.models.history import History
+from app.models.user import User
+from app.schemas.history_schema import HistoryOut
+from app.utils.jwt_handler import create_access_token
 import jwt
 from backend.config import SECRET_KEY, ALGORITHM
 from fastapi.security import HTTPBearer
