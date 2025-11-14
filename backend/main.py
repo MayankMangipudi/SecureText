@@ -21,10 +21,18 @@ from app.routes import auth_routes, crypto_routes, history_routes, learn_routes
 
 app = FastAPI(title="SecureText API", docs_url="/docs", redoc_url="/redoc")
 
-# CORS - Allow all origins for demo
+# CORS - Add your custom domain
+allowed_origins = [
+    "http://localhost:8080",
+    "https://secure-text-vit.vercel.app",
+    "https://secure-text-vit-*.vercel.app",
+    "https://securetext.mayankmangipudi.me",  # ✅ Add custom domain
+    "*"  # Remove this after testing
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
