@@ -1,8 +1,11 @@
-run = "uvicorn backend.main:app --host 0.0.0.0 --port 8000"
+run = "bash start.sh"
 
 [nix]
 channel = "stable-23_11"
 
 [deployment]
-run = ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port 8000"]
+run = ["sh", "-c", "bash start.sh"]
 deploymentTarget = "cloudrun"
+
+[env]
+PYTHONPATH = "${REPL_HOME}"
