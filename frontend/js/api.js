@@ -1,7 +1,7 @@
-// Auto-detect API URL
+// API URL - point to Railway backend
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://127.0.0.1:8000'  // Local development
-    : window.location.origin;  // Use same origin in production (Replit serves both)
+    : 'https://securetext-production.up.railway.app';  // ← Replace with YOUR Railway URL
 
 // Helper function to make API calls
 async function apiCall(endpoint, options = {}) {
