@@ -56,7 +56,7 @@ python -m http.server 8080
 
 ## Live Demo
 
-Visit: [https://securetext.onrender.com](https://securetext.onrender.com) 
+Visit: [https://securetext.mayankmangipudi.me](https://securetext.mayankmangipudi.me)
 
 ## Tech Stack
 
@@ -73,9 +73,6 @@ Visit: [https://securetext.onrender.com](https://securetext.onrender.com)
 - Alpine.js
 - Vanilla JavaScript
 
-## Screenshots
-
-*(Add screenshots after deployment)*
 
 ## Author
 
