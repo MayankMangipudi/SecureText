@@ -9,18 +9,9 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="SecureText API", docs_url="/docs", redoc_url="/redoc")
 
 # CORS - Allow Vercel frontend
-allowed_origins = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-    "https://secure-text-vit.vercel.app",  # ← Your actual Vercel URL
-    "https://secure-text-vit-*.vercel.app",  # Preview deployments
-    "https://securetext.mayankmangipudi.me",  # Your custom domain (when added)
-    "*"  # Allow all temporarily for testing
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for now
+    allow_origins=["*"],  # Allow all origins for demo
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
